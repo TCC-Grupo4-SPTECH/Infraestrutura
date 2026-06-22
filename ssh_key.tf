@@ -6,7 +6,7 @@ resource "tls_private_key" "ec2_ssh" {
 
 # Salva a chave privada em arquivo .pem local
 resource "local_file" "private_key" {
-  filename        = "${path.module}/${var.ec2_key_name}.pem"
+  filename        = "${var.ec2_key_name}.pem"
   content         = tls_private_key.ec2_ssh.private_key_pem
   file_permission = "0600"
 }

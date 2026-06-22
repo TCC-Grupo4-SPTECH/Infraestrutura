@@ -1,7 +1,6 @@
 resource "aws_batch_compute_environment" "main" {
-  compute_environment_name = "${var.project}-batch-compute"
   type                     = "MANAGED"
-  service_role     = var.lab_role_arn
+  service_role             = var.lab_role_arn
 
   compute_resources {
     type               = "FARGATE"

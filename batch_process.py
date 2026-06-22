@@ -172,9 +172,9 @@ def process_and_augment_images():
         filename = os.path.basename(image_file)
         label_file = os.path.join(INPUT_DIR, os.path.splitext(filename)[0] + ".txt")
         
-        if not os.path.exists(label_file):
-            logger.warning(f"Label não encontrada para {filename}")
-            continue
+        # if not os.path.exists(label_file):
+        #     logger.warning(f"Label não encontrada para {filename}")
+        #     continue
         
         # Carrega imagem
         image = cv2.imread(image_file)

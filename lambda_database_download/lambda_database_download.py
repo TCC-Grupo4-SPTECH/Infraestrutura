@@ -7,11 +7,14 @@ TAXON_IDS = [18938, 18937]
 
 BASE_URL = "https://api.inaturalist.org/v1/observations"
 S3_RAW_BUCKET = os.getenv("S3_RAW_BUCKET", "ai-pipeline-s3-raw")
+BATCH_JOB_QUEUE = os.getenv("BATCH_JOB_QUEUE", "")
+BATCH_JOB_DEF = os.getenv("BATCH_JOB_DEF", "")
 OUTPUT_DIR = Path("/tmp/dataset")
 
 PER_PAGE = 200
 
 s3_client = boto3.client("s3")
+batch_client = boto3.client("batch")
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
 
@@ -21,6 +24,25 @@ def upload_to_s3(local_path, bucket, key):
         print(f"Upload: {local_path} -> s3://{bucket}/{key}")
     except Exception as e:
         print(f"Erro ao enviar {local_path} para S3: {e}")
+        raise
+
+
+def submit_batch_job():
+    """Dispara um job no AWS Batch para data augmentation"""
+    if not BATCH_JOB_QUEUE or not BATCH_JOB_DEF:
+        print("BATCH_JOB_QUEUE ou BATCH_JOB_DEF não configurados. Pulando...")
+        return
+    
+    try:
+        response = batch_client.submit_job(
+            jobName=f"data-augmentation-{int(os.times()[4])}",
+            jobQueue=BATCH_JOB_QUEUE,
+            jobDefinition=BATCH_JOB_DEF
+        )
+        print(f"✅ Batch job enviado! Job ID: {response['jobId']}")
+        return response['jobId']
+    except Exception as e:
+        print(f"❌ Erro ao enviar Batch job: {e}")
         raise
 
 
@@ -112,4 +134,6 @@ for taxon_id in TAXON_IDS:
         f"({total_downloaded} imagens)"
     )
 
-print("\nDownload concluído.")
+print("\n✅ Download concluído!")
+print("📦 Disparando AWS Batch para data augmentation...")
+submit_batch_job()

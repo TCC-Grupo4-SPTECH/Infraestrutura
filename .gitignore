@@ -13,6 +13,7 @@ terraform.tfvars
 *.tfvars.json
 *.tfvars.*
 *.pem
+.terraform.lock.hcl
 
 # Local CLI configuration files
 .terraformrc

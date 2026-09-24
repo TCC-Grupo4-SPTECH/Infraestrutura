@@ -28,11 +28,9 @@ Arquivos Terraform:
 
 Arquivos de suporte:
 - `batch_process.py` - script Python de orquestração/executações de lote.
-- `lambda_client_images_processing/` - código-fonte Python da Lambda de processamento de imagens.
 - `lambda_database_download/` - código-fonte Python da Lambda de download de dados.
 
 Arquivos ZIP de deployment:
-- `lambda_client_images_processing.zip`
 - `lambda_database_download.zip`
 
 ## Como usar
@@ -55,9 +53,7 @@ As funções Lambda usam código Python que deve ser empacotado em arquivos ZIP 
 Por exemplo:
 
 ```powershell
-Remove-Item lambda_client_images_processing.zip
 Remove-Item lambda_database_download.zip
-Compress-Archive -Path lambda_client_images_processing\* -DestinationPath lambda_client_images_processing.zip
 Compress-Archive -Path lambda_database_download\* -DestinationPath lambda_database_download.zip
 ```
 

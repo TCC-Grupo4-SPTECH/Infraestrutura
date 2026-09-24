@@ -28,6 +28,7 @@ Arquivos Terraform:
 
 Arquivos de suporte:
 - `batch_process.py` - script Python de orquestração/executações de lote.
+- `setup_ec2_frontend.sh` - prepara a EC2 pública para hospedar uma aplicação Angular.
 - `lambda_database_download/` - código-fonte Python da Lambda de download de dados.
 
 Arquivos ZIP de deployment:

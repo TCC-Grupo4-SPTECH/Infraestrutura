@@ -35,7 +35,10 @@ resource "aws_security_group" "ec2_ai_server" {
     from_port       = 8080
     to_port         = 8080
     protocol        = "tcp"
-    security_groups = [aws_security_group.lambda.id]
+    security_groups = [
+      aws_security_group.lambda.id,
+      aws_security_group.ec2_frontend.id
+    ]
   }
 
   egress {
@@ -69,6 +72,13 @@ resource "aws_security_group" "ec2_frontend" {
   ingress {
     from_port   = 443
     to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    from_port   = 4200
+    to_port     = 4200
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }

@@ -1,6 +1,6 @@
 resource "aws_batch_compute_environment" "main" {
   type                     = "MANAGED"
-  service_role             = var.lab_role_arn
+  service_role             = local.effective_lab_role_arn
 
   compute_resources {
     type               = "FARGATE"
@@ -39,7 +39,8 @@ resource "aws_batch_job_definition" "processing" {
       { type = "MEMORY", value = "4096" }
     ]
 
-    executionRoleArn = var.lab_role_arn
+    executionRoleArn = local.effective_lab_role_arn
+    jobRoleArn       = local.effective_lab_role_arn
 
     environment = [
       { name = "S3_RAW_BUCKET",     value = aws_s3_bucket.raw.bucket },

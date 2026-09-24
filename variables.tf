@@ -15,9 +15,22 @@ variable "ec2_instance_type" {
   default = "t3.medium"
 }
 
+variable "ec2_root_volume_size" {
+  description = "Tamanho do volume raiz das instancias EC2 em GB"
+  type        = number
+  default     = 40
+}
+
 variable "lab_role_arn" {
   description = "ARN da LabRole do AWS Academy"
-  default     = "arn:aws:iam::639075827890:role/LabRole"
+  type        = string
+  default     = null
+}
+
+variable "lab_role_name" {
+  description = "Nome da role usada pelos serviços AWS"
+  type        = string
+  default     = "LabRole"
 }
 
 variable "aws_account_id" {

@@ -1,6 +1,6 @@
 resource "aws_lambda_function" "database_download" {
   function_name = "lambda_database_download"
-  role = var.lab_role_arn
+  role          = local.effective_lab_role_arn
   runtime       = "python3.12"
   handler       = "handler.main"
   filename      = "lambda_database_download.zip"

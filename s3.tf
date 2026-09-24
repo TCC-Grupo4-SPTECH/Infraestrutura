@@ -1,19 +1,19 @@
 resource "aws_s3_bucket" "raw" {
-  bucket        = "${var.project}-s3-raw"
+  bucket        = "${var.project}-project-s3-raw"
   force_destroy = true
-  tags          = { Name = "${var.project}-s3-raw" }
+  tags          = { Name = "${var.project}-project-s3-raw" }
 }
 
 resource "aws_s3_bucket" "trusted" {
-  bucket        = "${var.project}-s3-trusted"
+  bucket        = "${var.project}-project-s3-trusted"
   force_destroy = true
-  tags          = { Name = "${var.project}-s3-trusted" }
+  tags          = { Name = "${var.project}-project-s3-trusted" }
 }
 
 resource "aws_s3_bucket" "client" {
-  bucket        = "${var.project}-s3-client"
+  bucket        = "${var.project}-project-s3-client"
   force_destroy = true
-  tags          = { Name = "${var.project}-s3-client" }
+  tags          = { Name = "${var.project}-project-s3-client" }
 }
 
 

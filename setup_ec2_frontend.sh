@@ -26,14 +26,14 @@ if command -v apt-get >/dev/null 2>&1; then
 elif command -v dnf >/dev/null 2>&1; then
     log "Detected DNF package manager"
     dnf upgrade -y
-    dnf install -y ca-certificates curl gnupg2 nginx git unzip gcc gcc-c++ make
+    dnf install -y ca-certificates nginx git unzip gcc gcc-c++ make
 
     curl -fsSL "https://rpm.nodesource.com/setup_${NODE_MAJOR_VERSION}.x" | bash -
     dnf install -y nodejs
 elif command -v yum >/dev/null 2>&1; then
     log "Detected YUM package manager"
     yum update -y
-    yum install -y ca-certificates curl gnupg2 nginx git unzip gcc gcc-c++ make
+    yum install -y ca-certificates nginx git unzip gcc gcc-c++ make
 
     curl -fsSL "https://rpm.nodesource.com/setup_${NODE_MAJOR_VERSION}.x" | bash -
     yum install -y nodejs

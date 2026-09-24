@@ -12,14 +12,17 @@ if command -v apt-get >/dev/null 2>&1; then
     sudo apt-get update && sudo apt-get upgrade -y
     PKG_INSTALL="sudo apt-get install -y"
     EXTRA_PKGS="cloud-guest-utils python3-venv"
+    BASE_PKGS="python3 python3-pip $EXTRA_PKGS awscli unzip curl xfsprogs libxcb1 libx11-6 libgl1 libglib2.0-0"
 elif command -v dnf >/dev/null 2>&1; then
     sudo dnf upgrade -y
     PKG_INSTALL="sudo dnf install -y"
     EXTRA_PKGS="cloud-utils-growpart python3-virtualenv"
+    BASE_PKGS="python3 python3-pip $EXTRA_PKGS awscli unzip xfsprogs libxcb libX11 libXext libXrender mesa-libGL mesa-libEGL"
 elif command -v yum >/dev/null 2>&1; then
     sudo yum update -y
     PKG_INSTALL="sudo yum install -y"
     EXTRA_PKGS="cloud-utils-growpart python3-virtualenv"
+    BASE_PKGS="python3 python3-pip $EXTRA_PKGS awscli unzip xfsprogs libxcb libX11 libXext libXrender mesa-libGL mesa-libEGL"
 else
     echo "❌ Gerenciador de pacotes não suportado"
     exit 1
@@ -27,39 +30,49 @@ fi
 
 # 2. Instalar dependências básicas
 echo "📦 Instalando dependências..."
-$PKG_INSTALL python3 python3-pip $EXTRA_PKGS awscli unzip curl
+$PKG_INSTALL $BASE_PKGS
 
 # 3. Detectar disco principal
 echo "💽 Detectando disco principal..."
-ROOT_DISK=$(lsblk -o MOUNTPOINT,NAME | grep " /$" | awk '{print $2}' | sed 's/└─//g' | sed 's/├─//g' | head -n 1)
+ROOT_DEVICE=$(findmnt -n -o SOURCE /)
+ROOT_DISK=$(lsblk -no PKNAME "$ROOT_DEVICE" | head -n 1)
+ROOT_PARTITION="${ROOT_DEVICE##*[!0-9]}"
 
-if [[ "$ROOT_DISK" == "" ]]; then
-    echo "❌ Não foi possível detectar o disco automaticamente"
-    exit 1
+if [[ -n "$ROOT_DISK" && -n "$ROOT_PARTITION" ]]; then
+    echo "✔ Disco detectado: /dev/$ROOT_DISK, partição $ROOT_PARTITION"
+
+    # A expansão é opcional e não deve impedir o restante do setup.
+    echo "📈 Expandindo partição (se aplicável)..."
+    sudo growpart "/dev/$ROOT_DISK" "$ROOT_PARTITION" || true
+else
+    echo "⚠ Não foi possível detectar a partição raiz; pulando expansão do disco"
 fi
 
-echo "✔ Disco detectado: $ROOT_DISK"
-
-# 4. Expandir partição (EC2)
-echo "📈 Expandindo disco..."
-sudo growpart /dev/nvme0n1 1 || true
-sudo resize2fs /dev/nvme0n1p1 || true
-
-echo "✔ Disco expandido (se aplicável)"
+echo "✔ Etapa de expansão concluída (se aplicável)"
 
 # 5. Aumentar /tmp (evita erro do PyTorch)
 echo "🧠 Ajustando /tmp..."
 sudo mount -o remount,size=2G /tmp || true
 
+YOLO_ENV_DIR="/opt/yolo-env"
+YOLO_TMP_DIR="/opt/yolo-tmp"
+
+ROOT_FILESYSTEM=$(findmnt -n -o FSTYPE /)
+if [[ "$ROOT_FILESYSTEM" == "xfs" ]]; then
+    sudo xfs_growfs / || true
+elif [[ "$ROOT_FILESYSTEM" == "ext4" ]]; then
+    sudo resize2fs "$ROOT_DEVICE" || true
+fi
+
 # 6. Criar diretório temporário alternativo
-mkdir -p ~/tmp
-export TMPDIR=~/tmp
+mkdir -p "$YOLO_TMP_DIR"
+export TMPDIR="$YOLO_TMP_DIR"
 
 # 7. Criar ambiente virtual
 echo "🐍 Criando ambiente Python..."
-python3 -m venv yolo-env
+python3 -m venv "$YOLO_ENV_DIR"
 
-source yolo-env/bin/activate
+source "$YOLO_ENV_DIR/bin/activate"
 
 # 8. Atualizar pip
 echo "⬆️ Atualizando pip..."
@@ -96,7 +109,7 @@ echo "✅ SETUP CONCLUÍDO COM SUCESSO"
 echo "======================================"
 
 echo "Para ativar o ambiente depois:"
-echo "source yolo-env/bin/activate"
+echo "source $YOLO_ENV_DIR/bin/activate"
 echo ""
 echo "Para rodar seu script:"
 echo "python yolo_test.py"

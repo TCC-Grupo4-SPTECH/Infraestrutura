@@ -4,10 +4,11 @@ output "s3_client"  { value = aws_s3_bucket.client.bucket }
 
 output "lambda_database_download_arn"       { value = aws_lambda_function.database_download.arn }
 output "ec2_ai_server_private_ip"           { value = aws_instance.ec2_ai_server.private_ip }
+output "ec2_ai_server_public_ip"            { value = aws_eip.ai_server.public_ip }
 output "ec2_frontend_public_ip"             { value = aws_eip.frontend.public_ip }
 output "batch_job_queue"                    { value = aws_batch_job_queue.main.name }
 
 output "ssh_key_path"                       { value = local_file.private_key.filename }
 output "ssh_key_name"                       { value = aws_key_pair.ec2_ssh.key_name }
-output "ec2_ssh_command"                    { value = "ssh -i ${local_file.private_key.filename} ec2-user@${aws_instance.ec2_ai_server.private_ip}" } 
+output "ec2_ssh_command"                    { value = "ssh -i ${local_file.private_key.filename} ec2-user@${aws_eip.ai_server.public_ip}" }
 output "ec2_frontend_ssh_command"           { value = "ssh -i ${local_file.private_key.filename} ec2-user@${aws_eip.frontend.public_ip}" }

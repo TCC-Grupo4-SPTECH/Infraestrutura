@@ -78,9 +78,9 @@ source "$YOLO_ENV_DIR/bin/activate"
 echo "⬆️ Atualizando pip..."
 pip install --upgrade pip
 
-# 9. Instalar YOLO e boto3
-echo "🤖 Instalando YOLO + boto3 + albumentations..."
-pip install --no-cache-dir ultralytics boto3 albumentations
+# 9. Instalar dependências do YOLO e do backend Python
+echo "🤖 Instalando YOLO, dependências AWS e servidor FastAPI..."
+pip install --no-cache-dir ultralytics boto3 albumentations fastapi "uvicorn[standard]" python-multipart
 
 # 10. Configurar AWS CLI
 if [[ -n "$AWS_ACCESS_KEY_ID" && -n "$AWS_SECRET_ACCESS_KEY" ]]; then
